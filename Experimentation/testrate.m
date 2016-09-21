@@ -1,6 +1,7 @@
 %   filename:StartExperiment.m
 %   author:Huang Shuaiyi,Tongji University
 %   time:September,2016
+%   calculate accuracy rate:
 function [averagerate,rateset]=testrate(testname,truthids,get_indices)
 
 [knn1,NumofData1]=size(truthids);

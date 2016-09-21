@@ -16,6 +16,7 @@ function StartExperiment(Param)
     varmin=Param.varmin;
     varmax=Param.varmax;
     vargap=Param.vargap;
+    kdtype=Param.kdtype;
     fprintf('Experiment begin.\n')
     fprintf('dataset is %s:%d\n',dpath,dNum);
     fprintf('queryset is %s:%d\n',qpath,qNum);
@@ -31,7 +32,7 @@ function StartExperiment(Param)
 if strcmp(varname,'dHam')
     for var=varmin:vargap:varmax
         Variables=[Variables,var];
-        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,qNum,dNum,var,knn,tNum);
+        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,qNum,dNum,var,knn,tNum,kdtype);
         LSHSet=[LSHSet,LSHaverate];
         KDTreeSet=[KDTreeSet,KDTreeaverate];
     end
@@ -44,7 +45,7 @@ end
 if strcmp(varname,'tNum')
     for var=varmin:vargap:varmax
         Variables=[Variables,var];
-        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,qNum,dNum,dHam,knn,var);
+        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,qNum,dNum,dHam,knn,var,kdtype);
         LSHSet=[LSHSet,LSHaverate];
         KDTreeSet=[KDTreeSet,KDTreeaverate];
     end
@@ -56,19 +57,19 @@ end
 if strcmp(varname,'dNum')
     for var=varmin:vargap:varmax
         Variables=[Variables,var];
-        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,qNum,var,dHam,knn,tNum);
+        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,qNum,var,dHam,knn,tNum,kdtype);
         LSHSet=[LSHSet,LSHaverate];
         KDTreeSet=[KDTreeSet,KDTreeaverate];
     end
-    titlestr='准确率VS训练样本数量';
-    xlabelstr='训练样本数量';
+    titlestr='准确率VS数据库大小';
+    xlabelstr='数据库大小';
     ylabelstr='准确率';
 end 
 
 if strcmp(varname,'qNum')
     for var=varmin:vargap:varmax
         Variables=[Variables,var];
-        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,var,dNum,dHam,knn,tNum);
+        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,var,dNum,dHam,knn,tNum,kdtype);
         LSHSet=[LSHSet,LSHaverate];
         KDTreeSet=[KDTreeSet,KDTreeaverate];
     end
@@ -80,7 +81,7 @@ end
 if strcmp(varname,'knn')
     for var=varmin:vargap:varmax
         Variables=[Variables,var];
-        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,qNum,dNum,dHam,var,tNum);
+        [LSHaverate,KDTreeaverate]=SearchMain(qpath,dpath,qNum,dNum,dHam,var,tNum,kdtype);
         LSHSet=[LSHSet,LSHaverate];
         KDTreeSet=[KDTreeSet,KDTreeaverate];
     end
@@ -94,15 +95,23 @@ end
     experiment_KDTreeaverate=sum(KDTreeSet)/length(KDTreeSet);
     fprintf('Experiment %d times,done.\n',length(LSHSet));
     fprintf('LSH average accuracy rate is:%f\n',experiment_LSHaverate);
-    fprintf('KDTree average accuracy rate is:%f\n',experiment_KDTreeaverate);
     % plot(DimHashDataSet,LSHSet,'-*r',DimHashDataSet,KDTreeSet,'-*b')
      figure;
      plot(Variables,LSHSet,'-*r');
      title(titlestr);
      hold on;
-     plot(Variables,KDTreeSet,'-*b');
      grid on;
      xlabel(xlabelstr);
      ylabel(ylabelstr);
-     legend('LSH','KDTree',0);
+     
+     if strcmp(varname,'dHam')||strcmp(varname,'tNum')
+        legend('LSH',0);
+        ylim([0 1]);
+     else
+        fprintf('KDTree average accuracy rate is:%f\n',experiment_KDTreeaverate);
+        plot(Variables,KDTreeSet,'-*b');
+        legend('LSH','KDTree',0);
+        ylim([0 1]);
+     end
+     
 end
